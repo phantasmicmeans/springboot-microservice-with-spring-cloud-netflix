@@ -1,0 +1,23 @@
+spring:
+    application:
+        name: Alarm-service
+    
+    jpa: 
+      hibernate:
+        ddl-auto: update
+        show_sql: true
+        use_sql_comments: true
+        fotmat_sql: true
+        
+    datasource:
+      url: jdbc:mysql://127.0.0.1:3306/notice
+      username: sangmin
+      password: tkdals12
+      driver-class-name: com.mysql.jdbc.Driver
+      hikari:
+        maximum-pool-size: 2
+          
+    cloud:
+        config:
+            uri: ${CONFIG_SERVER_URL:http://127.0.0.1:8888}
+            

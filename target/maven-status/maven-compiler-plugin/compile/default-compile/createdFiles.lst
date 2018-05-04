@@ -1,0 +1,6 @@
+com/alarm/service/NoticeServiceImpl.class
+com/alarm/domain/Notice.class
+com/alarm/service/NoticeService.class
+com/alarm/AlarmServiceApplication.class
+com/alarm/rest/NoticeController.class
+com/alarm/repository/NoticeRepository.class
