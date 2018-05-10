@@ -13,4 +13,4 @@ eureka:
       homePageUrl: https://${eurkea.hostname}/
     preferIpAddress: true
 
-    
+

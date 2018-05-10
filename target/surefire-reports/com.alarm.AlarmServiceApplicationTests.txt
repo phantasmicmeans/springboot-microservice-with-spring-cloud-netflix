@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.alarm.AlarmServiceApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.738 s - in com.alarm.AlarmServiceApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.256 s - in com.alarm.AlarmServiceApplicationTests

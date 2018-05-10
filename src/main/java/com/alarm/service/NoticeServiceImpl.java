@@ -18,12 +18,14 @@ import org.springframework.stereotype.Service;
 
 import com.alarm.domain.Notice;
 import com.alarm.repository.NoticeRepository;
+import com.alarm.cache.*;
 
 @Service("noticeService")
 public class NoticeServiceImpl implements NoticeService{
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	
 	public CacheManager cachemanager;
 	
 	private List<Notice> result; 
@@ -73,7 +75,7 @@ public class NoticeServiceImpl implements NoticeService{
 	}
 	
 
-	@CachePut(value="usercache")
+	//@CachePut(value="usercache")
 	@Override
 	//@Cacheable(value="usercache")
     public List<Notice> findLatestNoticeByReceiverId(String receiver_id)
@@ -93,7 +95,7 @@ public class NoticeServiceImpl implements NoticeService{
 		*/
 	}
 	
-	@CachePut(value="usercache")
+	//@CachePut(value="usercache")
 	@Override
 	//@Cacheable(value="usercache")
 	public List<Notice> findPreviousNoticeByReceiverId(String receiver_id, int id)
@@ -103,6 +105,7 @@ public class NoticeServiceImpl implements NoticeService{
 		return noticeRepository.findPreviousNoticeByReceiverId(receiver_id, id,PageRequest.of(0, 10));
 		/*
 		List<Notice> AllNotice = new ArrayList<>();
+		
 
 		Iterable<Notice> allNoticeIter = noticeRepository.findAll();
 		
