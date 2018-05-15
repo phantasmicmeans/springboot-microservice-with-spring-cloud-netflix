@@ -5,11 +5,10 @@ Alarm Service
 
 > **NOTE** 
 > - 여기서는 MSA에서의 Service중 하나인 Alarm Service를 구축하여 본다.
-> - Service는 API Server로 구성된다.
-> - Alarm Service는 Spring boot Project로 구현된다.
+> - Alarm Service는 API Server로 구성되고, Spring Cloud Netflix의 여러 instance들을 사용한다. 
+> - Alarm Service는 Spring boot Project로 구현된다. 생성된 JAR파일을 Docker container로 띄워 서비스한다.
 > - 기존 Spring에서는 Maven, Gradle등의 dependency tool을 이용해 WAR파일을 생성한 후 tomcat같은 WAS에 배포하여
 웹 어플리케이션을 구동하였으나, Spring boot는 JAR파일에 내장 tomcat이 존재하여, 단순히 JAR파일을 빌드하고 실행하는 것 만으로 웹 어플리케이션 구동이 가능하다.
-> - API Server를 구축하고, 생성된 JAR파일을 Docker container로 띄워 서비스한다. 
 > - JPA repository로 DB에 접근한다.
 
 **Service는 "Service Register & Discovery" Server인 Eureka Server의 Client이다.**
