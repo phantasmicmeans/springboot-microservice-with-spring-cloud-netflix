@@ -10,6 +10,7 @@ Alarm Service
 > - 기존 Spring에서는 Maven, Gradle등의 dependency tool을 이용해 WAR파일을 생성한 후 tomcat같은 WAS에 배포하여
 웹 어플리케이션을 구동하였으나, Spring boot는 JAR파일에 내장 tomcat이 존재하여, 단순히 JAR파일을 빌드하고 실행하는 것 만으로 웹 어플리케이션 구동이 가능하다.
 > - API Server를 구축하고, 생성된 JAR파일을 Docker container로 띄워 서비스한다. 
+> - JPA repository로 DB에 접근한다.
 
 **Service는 "Service Register & Discovery" Server인 Eureka Server의 Client이다.**
 
@@ -137,3 +138,55 @@ POST | /notice/ | 알림 정보 입력
                 </repository>
         </repositories>
 ```
+
+## 4. resources ##
+
+bootstrap.yml file은 Spring cloud application에서 apllication.yml보다 먼저 실행된다. bootstrap.yml에서 db connection을 진행하고, apllication.yml에서 applicaion의 port와 eureka server instance의 정보를 포함시킨다.
+
+**1. bootstrap.yml**
+
+```xml
+spring:
+    application:
+        name: Alarm-service
+
+    jpa:
+      hibernate:
+        ddl-auto: update
+        show_sql: true
+        use_sql_comments: true
+        fotmat_sql: true
+
+    datasource:
+      url: jdbc:mysql://127.0.0.1:3306/notice
+      username: sangmin
+      password: tkdals12
+      driver-class-name: com.mysql.jdbc.Driver
+      hikari:
+        maximum-pool-size: 2
+
+    cloud:
+        config:
+            uri: ${CONFIG_SERVER_URL:http://127.0.0.1:8888}
+```
+
+**2. application.yml**
+
+```xml
+
+server:
+    port: 8763
+
+eureka:
+  client:
+    healthcheck: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: ${vcap.services.eureka-service.credentials.uri:http://192.168.10.168:8761}/eureka/
+    instance:
+      statusPageUrlPath: https://${eureka.hostname}/info
+      healthCheckUrlPath: https://${eureka.hostname}/health
+      homePageUrl: https://${eurkea.hostname}/
+    preferIpAddress: true
+```
+
