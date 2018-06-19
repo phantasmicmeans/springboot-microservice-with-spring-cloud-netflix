@@ -1,24 +1,42 @@
-Alarm Service 
+Spring Boot Microservice with Spring Cloud Netflix
 ==============
 
 by S.M.Lee
 
+![image](https://user-images.githubusercontent.com/20153890/41583901-d1e8aa5c-73e0-11e8-97ff-188fed3cd715.png)
 
-![image](https://user-images.githubusercontent.com/20153890/40037190-cfd1ca38-5846-11e8-8443-a00a08a57fb5.png)
 
 > **NOTE** 
-> - 여기서는 MSA에서의 Service중 하나인 Alarm Service를 구축하여 본다.
-> - Alarm Service는 API Server로 구성되고, Spring Cloud Netflix의 여러 instance들을 사용한다. 
-> - Alarm Service는 Spring boot Project로 구현된다. 생성된 JAR파일을 Docker container로 띄워 서비스한다.
+>
+> - 여기서는 MSA에서의 Service중 하나인 Notice Service를 구축하여 본다.
+> - Notice Service는 간단한 REST API Server로 구성되고, Spring Cloud Netflix의 여러 component(eureka, hystrix 등)들을 활용한다. 
+> - Notice Service는 Spring boot Project로 구현된다. 생성된 JAR파일을 Docker container로 띄워 서비스한다.
 > - 기존 Spring에서는 Maven, Gradle등의 dependency tool을 이용해 WAR파일을 생성한 후 tomcat같은 WAS에 배포하여
 웹 어플리케이션을 구동하였으나, Spring boot는 JAR파일에 내장 tomcat이 존재하여, 단순히 JAR파일을 빌드하고 실행하는 것 만으로 웹 어플리케이션 구동이 가능하다.
-> - JPA repository로 DB에 접근한다.
+> - JPA repository로 DB(MySQL 5.6)에 접근한다.
+
 
 **Service는 "Service Register & Discovery" Server인 Eureka Server의 Client이다.**
 
+진행하기에 앞서 Eureka와 Hystrix에 대한 이해는 필수적이다. 하지만 단순히 REST API Server 구축이 목표라면 스킵하고 진행해도 된다.
+> - *Netflix의 Eureka에 대한 이해 => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Eureka-Tutorial/*
+> - *Hystrix에 대한 이해  => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Eureka-Tutorial/*
+> - *Service Registration and Discovery => https://spring.io/guides/gs/service-registration-and-discovery/*
+> - *Service Discovery: Eureka Clients =>https://cloud.spring.io/spring-cloud-netflix/multi/multi__service_discovery_eureka_clients.html*
 
+위 reference를 모두 읽고 이 튜토리얼을 진행하면 순탄하게 진행할 수 있을 것이다.
 
-## 1. REST API  ##
+어쨌든 Eureka Client로 만들어진 Microservice는 Eureka Server(Registry)에 자신의 meta-data(host,port,address 등)를 전송한다. 이로인해 Eureka Client들은 Eureka Registry 정보를 이용해 서로간의 Communication이 가능하다.  
+
+그리고 Eureka Client는 자신이 살아 있음을 알리는 hearbeat를 Eureka Server에 보낸다. Eureka Server는 일정한 시간안에 hearbeat를 받지 못하면 Registry로 부터 Client의 정보를 제거한다.
+
+Eureka Client는 Registry에 자신의 hostname을 등록하게 되는데 이는 DNS 역할을 하며, 추후에 Netflix의 API Gateway에서 Ribbon + Hystrix + Eureka 조합을 적절히 활용하여 편하게 Dynamic Routing 시킬 수 있다. 
+
+큰 개념은 이정도로 이해하고 일단 Server를 구축하고 Eureka Client로 만들어보자.
+
+## 1. Service Description ##
+
+**REST API**
 
 METHOD | PATH | DESCRIPTION 
 ------------|-----|------------
@@ -29,29 +47,49 @@ GET | /notice/previous/{receiver_ID}/{id} | 해당 receiver 에 대한 정보들
 POST | /notice/ | 알림 정보 입력
 
 
+**table(table name = notice) description**
 
-## 2. Project directory tree
+| Field       | Type        | Null | Key | Default | Extra          |
+--------------|-------------|------|-----|---------|----------------|
+| id          | int(11)     | NO   | PRI | NULL    | auto_increment |
+| receiver_id | varchar(20) | NO   |     | NULL    |                |
+| sender_id   | varchar(20) | NO   |     | NULL    |                |
+| article_id  | int(11)     | NO   |     | NULL    |                |
 
+
+
+**Project directory tree**
 
     .
-    ├── AlarmServiceApplication.java
-    ├── domain                    
-    │   ├── Notice.java           
-    ├── repository                        
-    │   ├── NoticeRepository.java         
-    ├── rest   
-    │   ├── NoticeController.java         
-    ├── service
-        ├── NoticeService.java          
-        └── NoticeServiceImpl.java      
-    
-    
-    
-## 3. dependency ##
+    ├── Dockerfile
+    ├── mvnw
+    ├── mvnw.cmd
+    ├── pom.xml
+    ├── src/main/java/com/example/demo
+    |        |                      ├── AlarmServiceApplication.java   
+    |        |                      ├── domain                    
+    |        |                      |       └── Notice.java           
+    |        |                      ├── repository                        
+    |        |                      │       └── NoticeRepository.java         
+    |        |                      ├── rest   
+    |        |                      │       └──  NoticeController.java         
+    |        |                      ├── service
+    |        |                               ├── NoticeService.java          
+    |        |                               └── NoticeServiceImpl.java      
+    │        └── resources
+    │           ├── application.yml
+    │           └── bootstrap.yml
+    └── target
+          ├── classes
+          ├── notice-service-0.1.0.jar
+          ├── notice-service.0.1.0.jar.original
+          ├── generated-sources ...
 
 
+    
+## 2. dependency ##
 
-1. pom.xml에 eureka-client, hystrix, jpa, mysql-connector-java 추가 
+Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka-client dependency를 추가한다. 그리고 hystrix 적용을 위해 hystrix dependency 또한 추가한다.
 
 
 **pom.xml**
@@ -59,89 +97,107 @@ POST | /notice/ | 알림 정보 입력
 
 ```xml
 
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
+ 	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.1.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target> 
+        <spring-cloud.version>Finchley.M9</spring-cloud.version>
+        <docker.image.prefix>phantasmicmeans</docker.image.prefix>
+	</properties>
+
+	<dependencies>
+    	<dependency>
+        	<groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
+        	<groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-            <version>1.4.4.RELEASE</version>
+            <!--           <version>1.4.4.RELEASE</version> -->
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
-        <dependency>
-             <groupId>org.springframework.boot</groupId>
-             <artifactId>spring-boot-starter-data-jpa</artifactId>
-             <version>2.0.1.RELEASE</version>
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <!--    <version>1.4.0.RELEASE</version> -->
         </dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<version>2.0.1.RELEASE</version>
+		</dependency>		
         <dependency>
-              <groupId>mysql</groupId>
-              <artifactId>mysql-connector-java</artifactId>
-              <version>5.1.21</version>
-        </dependency>
-```
-2. dependency Management 추가 
+      		<groupId>mysql</groupId>
+      		<artifactId>mysql-connector-java</artifactId>
+            <version>5.1.21</version>
+        </dependency>        
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+    </dependencies>
 
-```xml
-        <dependencyManagement>
-                <dependencies>
-                        <dependency>
-                                <groupId>org.springframework.cloud</groupId>
-                                <artifactId>spring-cloud-dependencies</artifactId>
-                                <version>${spring-cloud.version}</version>
-                                <type>pom</type>
-                                <scope>import</scope>
-                        </dependency>
-                </dependencies>
-        </dependencyManagement>
-```
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
-3. docker build를 위한 dockerfile-maven-plugin, repository 추가 
-
-```xml
-
-        <build>
-                <plugins>
-                        <plugin>
-                                <groupId>org.springframework.boot</groupId>
-                                <artifactId>spring-boot-maven-plugin</artifactId>
-                        </plugin>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <version>1.3.6</version>
                 <configuration>
                     <repository>${docker.image.prefix}/${project.artifactId}</repository>
-                                <buildArgs>
-                                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
-                                </buildArgs>
-                </configuration>
+	        		<buildArgs>
+		        		<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+	        		</buildArgs>
+            	</configuration>
             </plugin>
 
-                        </plugins>
-                </build>
+			</plugins>
+		</build> 
 
-        <repositories>
-                <repository>
-                        <id>spring-milestones</id>
-                        <name>Spring Milestones</name>
-                        <url>https://repo.spring.io/milestone</url>
-                        <snapshots>
-                                <enabled>false</enabled>
-                        </snapshots>
-                </repository>
-        </repositories>
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+
 ```
-
-## 4. resources ##
+## 3. Configuration ##
 
 bootstrap.yml file은 Spring cloud application에서 apllication.yml보다 먼저 실행된다. bootstrap.yml에서 db connection을 진행하고, apllication.yml에서 applicaion의 port와 eureka server instance의 정보를 포함시킨다.
 
@@ -160,17 +216,16 @@ spring:
         fotmat_sql: true
 
     datasource:
-      url: jdbc:mysql://127.0.0.1:3306/notice
-      username: sangmin
-      password: tkdals12
+      url: jdbc:mysql://{Your_MYSQL_Server_Address}:3306/notice
+      username: {MYSQL_ID}
+      password: {MYSQL_PASSWORD}
       driver-class-name: com.mysql.jdbc.Driver
       hikari:
         maximum-pool-size: 2
 
-    cloud:
-        config:
-            uri: ${CONFIG_SERVER_URL:http://127.0.0.1:8888}
 ```
+
+사용중인 MySQL Server Address를 spring.datasource.url 부분에 입력해야한다. 또한 username과 password도 추가한다.
 
 **2. application.yml**
 
@@ -180,16 +235,13 @@ server:
     port: 8763
 
 eureka:
-  client:
-    healthcheck: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: ${vcap.services.eureka-service.credentials.uri:http://192.168.10.168:8761}/eureka/
+    client:
+        healthcheck: true
+        fetch-registry: true
+        serviceUrl:
+            defaultZone: ${vcap.services.eureka-service.credentials.uri:http://{Your-Eureka-server-Address}:8761}/eureka/
     instance:
-      statusPageUrlPath: https://${eureka.hostname}/info
-      healthCheckUrlPath: https://${eureka.hostname}/health
-      homePageUrl: https://${eurkea.hostname}/
-    preferIpAddress: true
+        preferIpAddress: true
 ```
 
 ## 4. JPA ##
