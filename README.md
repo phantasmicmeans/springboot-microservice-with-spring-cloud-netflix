@@ -15,6 +15,9 @@ by S.M.Lee
 웹 어플리케이션을 구동하였으나, Spring boot는 JAR파일에 내장 tomcat이 존재하여, 단순히 JAR파일을 빌드하고 실행하는 것 만으로 웹 어플리케이션 구동이 가능하다.
 > - JPA repository로 DB(MySQL 5.6)에 접근한다.
 
+  
+&nbsp;
+&nbsp;
 
 **Service는 "Service Register & Discovery" Server인 Eureka Server의 Client이다.**
 
@@ -26,6 +29,8 @@ by S.M.Lee
 
 위 reference를 모두 읽고 이 튜토리얼을 진행하면 순탄하게 진행할 수 있을 것이다.
 
+&nbsp;
+
 어쨌든 Eureka Client로 만들어진 Microservice는 Eureka Server(Registry)에 자신의 meta-data(host,port,address 등)를 전송한다. 이로인해 Eureka Client들은 Eureka Registry 정보를 이용해 서로간의 Communication이 가능하다.  
 
 그리고 Eureka Client는 자신이 살아 있음을 알리는 hearbeat를 Eureka Server에 보낸다. Eureka Server는 일정한 시간안에 hearbeat를 받지 못하면 Registry로 부터 Client의 정보를 제거한다.
@@ -33,6 +38,9 @@ by S.M.Lee
 Eureka Client는 Registry에 자신의 hostname을 등록하게 되는데 이는 DNS 역할을 하며, 추후에 Netflix의 API Gateway에서 Ribbon + Hystrix + Eureka 조합을 적절히 활용하여 편하게 Dynamic Routing 시킬 수 있다. 
 
 큰 개념은 이정도로 이해하고 일단 Server를 구축하고 Eureka Client로 만들어보자.
+
+&nbsp;
+&nbsp;
 
 ## 1. Service Description ##
 
@@ -46,8 +54,11 @@ GET | /notice/latest/{receiver_ID} | 해당 receiver 에 대한 최근 10개 알
 GET | /notice/previous/{receiver_ID}/{id} | 해당 receiver 에 대한 정보들 중 {id}값을 기준으로 이전 10개 정보 제공
 POST | /notice/ | 알림 정보 입력
 
+&nbsp;
+&nbsp;
 
-**table(table name = notice) description**
+
+**Table(table name = notice) description**
 
 | Field       | Type        | Null | Key | Default | Extra          |
 --------------|-------------|------|-----|---------|----------------|
@@ -87,7 +98,7 @@ POST | /notice/ | 알림 정보 입력
 
 
     
-## 2. dependency ##
+## 2. Dependency ##
 
 Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka-client dependency를 추가한다. 그리고 hystrix 적용을 위해 hystrix dependency 또한 추가한다.
 
@@ -197,6 +208,10 @@ Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka
 
 
 ```
+
+&nbsp;
+&nbsp;
+
 ## 3. Configuration ##
 
 bootstrap.yml file은 Spring cloud application에서 apllication.yml보다 먼저 실행된다. bootstrap.yml에서 db connection을 진행하고, apllication.yml에서 applicaion의 port와 eureka server instance의 정보를 포함시킨다.
@@ -243,6 +258,9 @@ eureka:
     instance:
         preferIpAddress: true
 ```
+
+&nbsp;
+&nbsp;
 
 ## 4. JPA ##
 
