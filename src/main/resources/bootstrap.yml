@@ -1,6 +1,6 @@
 spring:
     application:
-        name: alarm-service
+        name: notice-service
     
     jpa: 
       hibernate:
@@ -16,13 +16,4 @@ spring:
       driver-class-name: com.mysql.jdbc.Driver
       hikari:
         maximum-pool-size: 2
-          
-    cache:
-      ehcache:
-        config: classpath:encache.xml
 
-      
-    cloud:
-        config:
-            uri: ${CONFIG_SERVER_URL:http://127.0.0.1:8888}
-            

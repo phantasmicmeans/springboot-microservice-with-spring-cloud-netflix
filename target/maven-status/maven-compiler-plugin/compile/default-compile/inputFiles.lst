@@ -1,7 +1,7 @@
-/home/sangmin/eclipse-workspace/AlarmService/src/main/java/com/alarm/service/NoticeService.java
-/home/sangmin/eclipse-workspace/AlarmService/src/main/java/com/alarm/rest/NoticeController.java
-/home/sangmin/eclipse-workspace/AlarmService/src/main/java/com/alarm/cache/CacheManagerCheck.java
-/home/sangmin/eclipse-workspace/AlarmService/src/main/java/com/alarm/repository/NoticeRepository.java
-/home/sangmin/eclipse-workspace/AlarmService/src/main/java/com/alarm/AlarmServiceApplication.java
-/home/sangmin/eclipse-workspace/AlarmService/src/main/java/com/alarm/domain/Notice.java
-/home/sangmin/eclipse-workspace/AlarmService/src/main/java/com/alarm/service/NoticeServiceImpl.java
+/home/sangmin/GitLab/my_git/MSA-SpringCloud-Service-example/src/main/java/com/alarm/service/NoticeService.java
+/home/sangmin/GitLab/my_git/MSA-SpringCloud-Service-example/src/main/java/com/alarm/repository/NoticeRepository.java
+/home/sangmin/GitLab/my_git/MSA-SpringCloud-Service-example/src/main/java/com/alarm/domain/Notice.java
+/home/sangmin/GitLab/my_git/MSA-SpringCloud-Service-example/src/main/java/com/alarm/AlarmServiceApplication.java
+/home/sangmin/GitLab/my_git/MSA-SpringCloud-Service-example/src/main/java/com/alarm/cache/CacheManagerCheck.java
+/home/sangmin/GitLab/my_git/MSA-SpringCloud-Service-example/src/main/java/com/alarm/service/NoticeServiceImpl.java
+/home/sangmin/GitLab/my_git/MSA-SpringCloud-Service-example/src/main/java/com/alarm/rest/NoticeController.java

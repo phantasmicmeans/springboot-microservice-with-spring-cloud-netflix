@@ -1,3 +1,4 @@
+com/alarm/cache/CacheManagerCheck.class
 com/alarm/service/NoticeServiceImpl.class
 com/alarm/domain/Notice.class
 com/alarm/service/NoticeService.class

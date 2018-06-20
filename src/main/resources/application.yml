@@ -2,15 +2,12 @@ server:
     port: 8763
 
 eureka:
-  client:
-    healthcheck: true 
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: ${vcap.services.eureka-service.credentials.uri:http://127.0.0.1:8761}/eureka/
+    client:
+        healthcheck: true 
+        fetch-registry: true
+        serviceUrl:
+            defaultZone: ${vcap.services.eureka-service.credentials.uri:http://127.0.0.1:8761}/eureka/
     instance:
-      statusPageUrlPath: https://${eureka.hostname}/info
-      healthCheckUrlPath: https://${eureka.hostname}/health
-      homePageUrl: https://${eurkea.hostname}/
-    preferIpAddress: true
+        preferIpAddress: true
 
 
