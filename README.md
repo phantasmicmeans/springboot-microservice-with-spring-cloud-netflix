@@ -544,8 +544,7 @@ public class NoticeServiceImpl implements NoticeService{
 **NoticeController.java 일부**
 
 
-```java@RestController
-
+```java
 @RestController
 @CrossOrigin(origins="*")
 public class NoticeController {
