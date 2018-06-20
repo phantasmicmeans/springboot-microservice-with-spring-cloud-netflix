@@ -31,11 +31,17 @@ public class NoticeController {
 
 	@RequestMapping(value = "/notice", method=RequestMethod.GET)
 	public ResponseEntity<List<Notice>> getAllNotice(){
-	
-		Optional<List<Notice>> maybeAllStory = Optional.ofNullable(noticeService.findAllNotice());
+    
+        try{
+
+		    Optional<List<Notice>> maybeAllStory = Optional.ofNullable(noticeService.findAllNotice());
 		
-		return new ResponseEntity<List<Notice>>(maybeAllStory.get(), HttpStatus.OK);
-		
+		    return new ResponseEntity<List<Notice>>(maybeAllStory.get(), HttpStatus.OK);
+
+        }catch(Exception e)
+        {
+ 			return new ResponseEntity<List<Notice>>(HttpStatus.NOT_FOUND);
+        }
 	
 	}
 
