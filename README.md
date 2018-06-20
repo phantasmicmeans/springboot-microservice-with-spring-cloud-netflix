@@ -200,7 +200,7 @@ bootstrap.yml file은 Spring cloud application에서 apllication.yml보다 먼�
 ```xml
 spring:
     application:
-        name: Alarm-service
+        name: notice-service
 
     jpa:
       hibernate:
