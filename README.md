@@ -1,7 +1,7 @@
 Spring Boot Microservice with Spring Cloud Netflix
 ==============
 
-by S.M.Lee
+*by S.M.Lee*
 
 ![image](https://user-images.githubusercontent.com/20153890/41583901-d1e8aa5c-73e0-11e8-97ff-188fed3cd715.png)
 
@@ -449,7 +449,7 @@ public interface NoticeRepository extends CrudRepository<Notice, String>{
 위 코드는 실제 Notice Entity를 이용하기 위한 Repository이다. 기본적인 CRUD외에 필자가 필요한 메소드를 @Query를 이용해 기존의 SQL처럼 사용하도록 지정해 놓은 상태이다.
 
 이 외에도 CrudRepositorys는 find(), findAll(), findAllById() 등 여러 method를 제공한다. 이에 대한 세부사항은 다음 레퍼런스를 꼭 참고하자.
-Interface CrudRepository<T,ID> => https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/CrudRepository.html
+* Interface CrudRepository<T,ID> => https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/CrudRepository.html
 
 
 ## 5. Service ## 
@@ -464,7 +464,7 @@ Interface CrudRepository<T,ID> => https://docs.spring.io/spring-data/commons/doc
         
 먼저 NoticeService.java 와 NoticeServiceImpl.java파일을 생성한다. NoticeService는 interface로 생성할 것이고, 이에대한 명세는 NoticeServiceImpl.java에서 구현한다. interface에 대한 method 구현시 NoticeRepository의 method를 활용한다.
 
-**NoticeService.java **
+**NoticeService.java**
 
 ```java
 public interface NoticeService {
@@ -559,10 +559,14 @@ public class NoticeController {
 	@RequestMapping(value = "/notice", method=RequestMethod.GET)
 	public ResponseEntity<List<Notice>> getAllNotice(){
 	
-		Optional<List<Notice>> maybeAllStory = Optional.ofNullable(noticeService.findAllNotice());
+		try{
+			Optional<List<Notice>> maybeAllStory = Optional.ofNullable(noticeService.findAllNotice());
 		
-		return new ResponseEntity<List<Notice>>(maybeAllStory.get(), HttpStatus.OK);
-		
+			return new ResponseEntity<List<Notice>>(maybeAllStory.get(), HttpStatus.OK);
+		}catch(Exception e)
+		{
+			return new ResponseEntity<List<Notice>>(HttpStatus.NOT_FOUND);
+		}	
 	}	
 
 	@RequestMapping(value="/notice/{receiver_id}", method = RequestMethod.GET)
