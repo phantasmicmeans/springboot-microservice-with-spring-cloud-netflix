@@ -421,6 +421,7 @@ public class Notice {
 }
 ```
 
+&nbsp;
 
 ## 4.2 Repository ##  
 
@@ -451,6 +452,7 @@ public interface NoticeRepository extends CrudRepository<Notice, String>{
 이 외에도 CrudRepositorys는 find(), findAll(), findAllById() 등 여러 method를 제공한다. 이에 대한 세부사항은 다음 레퍼런스를 꼭 참고하자.
 * Interface CrudRepository<T,ID> => https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/CrudRepository.html
 
+&nbsp;
 
 ## 5. Service ## 
 
@@ -526,6 +528,7 @@ public class NoticeServiceImpl implements NoticeService{
 
 ```
 
+&nbsp;
 
 ## 6. Rest Controller ## 
 
@@ -586,6 +589,7 @@ public class NoticeController {
 	}
 
 ```
+&nbsp;
 
 ## 7. Maven Packaging ## 
 
@@ -606,6 +610,7 @@ Host OS에 설치된 maven을 이용해도 되고, spring boot application의 ma
 ```bash
 [sangmin@Mint-SM] ~/springcloud-service $ ./mvnw package 
 ```
+&nbsp;
 
 ## 8. Execute Spring Boot Application ##
 
@@ -623,7 +628,9 @@ Check Your Eureka Dashboard
 
 Client가 Eureka Server에 등록 될 때 약간의 시간이 소요될 수 있다.
 
-## 8. Dockerizing ## 
+&nbsp;
+
+## 9. Dockerizing ## 
 
 구축한 Eureka Client를 docker image를 만들어 볼 차례이다. 먼저 Dockerfile을 작성한다. 
 
@@ -665,8 +672,9 @@ phantasmicmeans/notice-service  latest              4b79d6a1ed24        2 weeks 
 openjdk                         8-jdk-alpine        224765a6bdbe        5 months ago        102MB
 
 ```
+&nbsp;
 
-## 9.  Run Docker Container ##
+## 10.  Run Docker Container ##
 
 Docker image를 생성하였으므로 이미지를 실행 시켜보자.
 
