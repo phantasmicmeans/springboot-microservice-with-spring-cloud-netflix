@@ -10,7 +10,7 @@ by S.M.Lee
 &nbsp;
 
 > - 여기서는 MSA에서의 Service중 하나인 Notice Service를 구축하여 본다.
-> - Notice Service는 간단한 REST API Server로 구성되고, Spring Cloud Netflix의 여러 component(eureka, hystrix 등)들을 활용한다. 
+> - Notice Service는 간단한 REST API Server로 구성되고, Spring Cloud Netflix의 여러 component들을 활용한다. 
 > - Notice Service는 Spring boot Project로 구현된다. 생성된 JAR파일을 Docker container로 띄워 서비스한다.
 > - 기존 Spring에서는 Maven, Gradle등의 dependency tool을 이용해 WAR파일을 생성한 후 tomcat같은 WAS에 배포하여
 웹 어플리케이션을 구동하였으나, Spring boot는 JAR파일에 내장 tomcat이 존재하여, 단순히 JAR파일을 빌드하고 실행하는 것 만으로 웹 어플리케이션 구동이 가능하다.
@@ -21,29 +21,6 @@ by S.M.Lee
 &nbsp;
 
 ## Service Description ##
-
-**REST API**
-
-METHOD | PATH | DESCRIPTION 
-------------|-----|------------
-GET | /notice/ | 전체 알림정보 제공
-GET | /notice/{receiver_ID} | 해당 receiver 에 대한 알림 정보 제공
-GET | /notice/latest/{receiver_ID} | 해당 receiver 에 대한 최근 10개 알림정보 제공
-GET | /notice/previous/{receiver_ID}/{id} | 해당 receiver 에 대한 정보들 중 {id}값을 기준으로 이전 10개 정보 제공
-POST | /notice/ | 알림 정보 입력
-
-&nbsp;
-&nbsp;
-
-
-**Table(table name = notice) description**
-
-| Field       | Type        | Null | Key | Default | Extra          |
---------------|-------------|------|-----|---------|----------------|
-| id          | int(11)     | NO   | PRI | NULL    | auto_increment |
-| receiver_id | varchar(20) | NO   |     | NULL    |                |
-| sender_id   | varchar(20) | NO   |     | NULL    |                |
-| article_id  | int(11)     | NO   |     | NULL    |                |
 
 
 
@@ -129,40 +106,40 @@ Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka
 	</properties>
 
 	<dependencies>
-    	<dependency>
-        	<groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-        <dependency>
-        	<groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-            <!--           <version>1.4.4.RELEASE</version> -->
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
+    		<dependency>
+        		<groupId>org.springframework.cloud</groupId>
+            		<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+       		</dependency>
+        	<dependency>
+        		<groupId>org.springframework.cloud</groupId>
+            		<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+           		<!--           <version>1.4.4.RELEASE</version> -->
+        	</dependency>
+        	<dependency>
+            		<groupId>org.springframework.boot</groupId>
+            		<artifactId>spring-boot-starter-actuator</artifactId>
+        	</dependency>
 		<dependency>
-    		<groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <!--    <version>1.4.0.RELEASE</version> -->
-        </dependency>
+    			<groupId>org.springframework.boot</groupId>
+            		<artifactId>spring-boot-starter-web</artifactId>
+            		<!--    <version>1.4.0.RELEASE</version> -->
+        	</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 			<version>2.0.1.RELEASE</version>
 		</dependency>		
-        <dependency>
-      		<groupId>mysql</groupId>
-      		<artifactId>mysql-connector-java</artifactId>
-            <version>5.1.21</version>
-        </dependency>        
-        <dependency>
+        	<dependency>
+      			<groupId>mysql</groupId>
+      			<artifactId>mysql-connector-java</artifactId>
+            		<version>5.1.21</version>
+        	</dependency>        
+        	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-    </dependencies>
+    	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>
@@ -181,22 +158,21 @@ Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>1.3.6</version>
-                <configuration>
-                    <repository>${docker.image.prefix}/${project.artifactId}</repository>
-	        		<buildArgs>
-		        		<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
-	        		</buildArgs>
-            	</configuration>
-            </plugin>
+			</plugin>	
+           		 <plugin>
+                		<groupId>com.spotify</groupId>
+                		<artifactId>dockerfile-maven-plugin</artifactId>
+                		<version>1.3.6</version>
+                		<configuration>
+                    		<repository>${docker.image.prefix}/${project.artifactId}</repository>
+	        			<buildArgs>
+		        			<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+	        			</buildArgs>
+            			</configuration>
+            		</plugin>
 
-			</plugins>
-		</build> 
+		</plugins>
+	</build> 
 
 	<repositories>
 		<repository>
@@ -263,15 +239,83 @@ eureka:
 
 eureka.client.serviceUrl.defaultZone에 다음처럼 Eureka Server Address를 추가한다.
 
-* fetch-registry - Eureka Registry로 부터 Registry에 속해 있는 Eureka Client들의 정보를 가져올 수 있는 옵션이다. 이는 true로 주자!
-* defaultZone - Spring Cloud Netflix의 공식 Document에서는 "defaultZone" is a magic string fallback value that provides the service URL for any client that does not express a preference (in other words, it is a useful default).  라고 소개한다. 뭐 일단 이대로 진행하면 된다. 
-* instance.preferIpAddress - Eureka Client를 Registry에 등록하고 http://localhost:8761에 접속하면 
+* eureak.client.fetch-registry - Eureka Registry로 부터 Registry에 속해 있는 Eureka Client들의 정보를 가져올 수 있는 옵션이다. 이는 true로 주자!
+* eureka.client.serviceUrl.defaultZone - Spring Cloud Netflix의 공식 Document에서는 "defaultZone" is a magic string fallback value that provides the service URL for any client that does not express a preference (in other words, it is a useful default).  라고 소개한다. 뭐 일단 이대로 진행하면 된다. 
+* eureka.instance.preferIpAddress - Eureka Client가 Eureka Registry에 자신을 등록할 때 eureka.instance.hostname으로 등록하게 된다. 그러나 어떠한 경우에는 hostname보다 IP Address가 필요한 경우가 있다. 여기서는 IP Address를 이용할 것이다. 
+* eureka.instance.hostname - JAVA단에서 hostname을 찾지 못하면 IP Address로 Eureka Registry에 전송된다. (이를 방지하려면 eureka.instance.hostname={your_hostname} 으로 원하는 hostname을 입력해도 되고, eureka.instance.hostname=${HOST_NAME} 으로 environment variable을 이용해 run-time때 hostname을 지정해줘도 된다.)
+* eureka.instance.instanceId - 위의 예시에서는 instanceId를 등록하지 않는다. default는 ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}} 이다. Eureka Server가 같은 service(application)이지만 다른 client임을 구별하기 위한 용도로 사용할 수 있다.
+
+*참고*
+* Eureka Client들을 Eureka Registry에 등록하면 다음처럼 등록된다.(아래 사진은 예시일뿐이다.)
+![image](https://user-images.githubusercontent.com/20153890/41632852-e3c59ffa-7476-11e8-8920-0935bafc1c40.png)
+
+
+사진을 보면 Application, AMIs, Availability Zones, Status를 확인 할 수 있다.
+* Application에 보여지는 여러 Service들은 각 Eureka Client의 spring.application.name이다.
+* Status는 현재 service가 Up인 상태인지, Down인 상태인지를 나타낸다. 
+
+또 한가지 알아두어야 할 점은 Status 오른쪽의 list들이다. 이 list에는 각 Eureka Client의 eureka.instance.instanceId값이 등록된다.
+쉽게 이해하기 위해 Notice-Service를 보자.
+
+Notice-Service는 3개의 Up상태인 client를 가지고 있다. 
+* notice-service:7c09a271351a998027f0d1e2c72148e5  
+* notice-service:14d5f9837de754b077a6b58b7e159827  
+* notice-service:7c6d41264f2f71925591bbc07cfe51ec 
+
+이 3개의 client는 spring.application.name=notice-service로 같지만, eureka.instance.instanceId가 각기 다르단 얘기이다. 
+
+즉 Eureka Registry에 같은 spring.application.name을 가진 어떠한 Client가 등록되면, eureka.instance.instanceId값으로 구분 할 수 있다는 얘기다. 우리는 이를 잘 이용해서 추후에 Dynamic Routing을 할 것이므로 알아 두자.
 
 
 &nbsp;
 &nbsp;
 
-## 4. JPA ##
+## 3. EurekaClient ##
+
+```java
+@SpringBootApplication
+@EnableEurekaClient
+public class AlarmServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AlarmServiceApplication.class, args);
+	}
+```
+
+dependency는 앞에서 설정 했으므로 main class에 @EnableEurekaClient annotation만 추가하면 된다. 
+
+그럼 이 Eureka Client를 REST API Server로 만들어보자
+
+&nbsp;
+
+## 4. REST API Server 구축 ##
+
+**REST API**
+
+METHOD | PATH | DESCRIPTION 
+------------|-----|------------
+GET | /notice/ | 전체 알림정보 제공
+GET | /notice/{receiver_ID} | 해당 receiver 에 대한 알림 정보 제공
+GET | /notice/latest/{receiver_ID} | 해당 receiver 에 대한 최근 10개 알림정보 제공
+GET | /notice/previous/{receiver_ID}/{id} | 해당 receiver 에 대한 정보들 중 {id}값을 기준으로 이전 10개 정보 제공
+POST | /notice/ | 알림 정보 입력
+
+&nbsp;
+&nbsp;
+
+
+**Table(table name = notice) description**
+
+| Field       | Type        | Null | Key | Default | Extra          |
+--------------|-------------|------|-----|---------|----------------|
+| id          | int(11)     | NO   | PRI | NULL    | auto_increment |
+| receiver_id | varchar(20) | NO   |     | NULL    |                |
+| sender_id   | varchar(20) | NO   |     | NULL    |                |
+| article_id  | int(11)     | NO   |     | NULL    |                |
+
+
+우리는 JPA를 이용해 DB에 접근할 것이다. 따라서 JPA란 무엇인지에 대해 간단하게 알아보고 넘어가자.
+(DB setting은 개인적으로 하자..)
 
 **JPA란?**
 
@@ -301,9 +345,10 @@ Annotaion | DESCRIPTION
 
 @Table annotaion또한 기본적으로 @Entity로 선언된 class의 이름과 실제 DB의 Table 명이 일치하는 것을 mapping한다.
 
+
 ## 4.1 JPA Entity ##
 
-SpringBoot에서는 JPA로 데이터를 접근하게끔 유도하고 있다. 
+SpringBoot에서는 JPA로 데이터를 접근하게끔 유도하고 있다. 이를 활용해서 REST API Server를 구축해보자.
 
 아래는 JPA Entity를 담당할 Class이다. 
 
@@ -378,21 +423,28 @@ CrudRepository라는 interface를 제공한다.
 
 **NoticeRepository.java**
 ```java
-
 public interface NoticeRepository extends CrudRepository<Notice, String>{
-
-
-        @Query("SELECT n FROM Notice n WHERE receiver_id=:receiver_id ORDER BY id DESC")
-        List<Notice> findLatestNoticeByReceiverId(@Param("receiver_id") String title, Pageable pageable);
-
-        @Query("SELECT n FROM Notice n WHERE n.receiver_id=:receiver_id AND n.id < :id ORDER BY n.id DESC")
-        List<Notice> findPreviousNoticeByReceiverId(@Param("receiver_id")String title, @Param("id") int id, Pageable pageable);
-
-
+	
+	
+	@Query("SELECT n FROM Notice n WHERE receiver_id=:receiver_id ORDER BY id DESC")
+	List<Notice> findNoticeByReceiverId(@Param("receiver_id") String receiver_id);
+	
+	@Query("SELECT n FROM Notice n WHERE receiver_id=:receiver_id ORDER BY id DESC")
+	List<Notice> findLatestNoticeByReceiverId(@Param("receiver_id") String receiver_id, Pageable pageable);
+	
+	@Query("SELECT n FROM Notice n WHERE n.receiver_id=:receiver_id AND n.id < :id ORDER BY n.id DESC")
+	List<Notice> findPreviousNoticeByReceiverId(@Param("receiver_id")String receiver_id, @Param("id") int id, Pageable pageable);
+	
+	
 }
+
 ```
 
 위 코드는 실제 Notice Entity를 이용하기 위한 Repository이다. 기본적인 CRUD외에 필자가 필요한 메소드를 @Query를 이용해 기존의 SQL처럼 사용하도록 지정해 놓은 상태이다.
+
+이 외에도 CrudRepositorys는 find(), findAll(), findAllById() 등 여러 method를 제공한다. 이에 대한 세부사항은 다음 레퍼런스를 꼭 참고하자.
+Interface CrudRepository<T,ID> => https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/CrudRepository.html
+
 
 ## 5. Service ## 
 
@@ -404,7 +456,7 @@ public interface NoticeRepository extends CrudRepository<Notice, String>{
         ├── NoticeService.java          
         └── NoticeServiceImpl.java     
         
-먼저 NoticeService.java 와 NoticeServiceImpl.java파일을 생성한다. NoticeService는 interface로 생성할 것이고, 이에대한 명세는 NoticeServiceImpl.java에서 구현한다.
+먼저 NoticeService.java 와 NoticeServiceImpl.java파일을 생성한다. NoticeService는 interface로 생성할 것이고, 이에대한 명세는 NoticeServiceImpl.java에서 구현한다. interface에 대한 method 구현시 NoticeRepository의 method를 활용한다.
 
 **NoticeService.java **
 
@@ -426,132 +478,103 @@ public interface NoticeService {
 @Service("noticeService")
 public class NoticeServiceImpl implements NoticeService{
 
-        private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 
-        private List<Notice> result;
+	@Autowired
+	private NoticeRepository noticeRepository;
+	
+	@Override
+	public List<Notice> findAllNotice()
+	{
+		
+		Optional<Iterable<Notice>> maybeNoticeIter = Optional.ofNullable(noticeRepository.findAll());
+		
+		return Lists.newArrayList(maybeNoticeIter.get());
 
-        @Autowired
-        private NoticeRepository noticeRepository;
+		
+	}
+	
+	@Override
+	public List<Notice> findAllNoticeByReceiverId(String receiver_id)
+	{
+	    
+		Optional<List<Notice>> maybeNotice =
+			Optional.ofNullable(noticeRepository.findNoticeByReceiverId(receiver_id));
+		
+		return maybeNotice.get();
 
-        @Override
-        public List<Notice> findAllNotice()
-        {
-                List<Notice> AllNotice = new ArrayList<>();
+	}
+	
 
-                Iterable<Notice> allNoticeIter = noticeRepository.findAll();
+	@Override
+    public List<Notice> findLatestNoticeByReceiverId(String receiver_id)
+    {
+		Optional<List<Notice>> maybeLatestNotice= 			
+			Optional.ofNullable(noticeRepository.findLatestNoticeByReceiverId(receiver_id, PageRequest.of(0, 10)));
+		
+		return maybeLatestNotice.get();
 
-                Consumer<Notice> noticeList = (notice) -> {
-                        AllNotice.add(notice);
-                };
+	
+	}
 
-                allNoticeIter.forEach(noticeList);
-
-                return AllNotice;
-        }
-
-        @Override
-        public List<Notice> findAllNoticeByReceiverId(String receiver_id)
-        {
-                result = new ArrayList<>();
-
-                Iterable<Notice>notiIter = noticeRepository.findAll();
-
-                notiIter.forEach(result::add);
-                List<Notice> matchingResult = result.stream()
-                                              .filter(receiver-> receiver.getReceiver_id()
-                                              .equals(receiver_id))
-                                              .collect(Collectors.toList());
-                return matchingResult;
-        }
-
-        @Override
-        public List<Notice> findLatestNoticeByReceiverId(String receiver_id)
-        {
-                return noticeRepository.findLatestNoticeByReceiverId(receiver_id,PageRequest.of(0, 10));
-        }
 ```
+
 
 ## 6. Rest Controller ## 
 
-이제 API를 만들어 보자. rest package를 따로 만들고 그곳에 RestController들을 정의한다.
+이제 controller를 만들어 보자. rest package를 따로 만들고 그곳에 RestController들을 정의한다. 
+
+
 
     ├── rest   
     │   ├── NoticeController.java 
     
-위처럼 NoticeController.java를 만들고, @RestControler annotation을 설정하여 RestController를 만든다.
+@RestControler annotation을 설정하여 RestController를 만든다.
+(HystrixMethod적용은 다음 단계에서 진행한다. 여기서는 REST API만 구축한다)
 
 **NoticeController.java 일부**
 
 
-```java
+```java@RestController
+
 @RestController
+@CrossOrigin(origins="*")
 public class NoticeController {
 
-        private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    public static List<Notice> Temp;
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    	public static List<Notice> Temp;
 
-        @Autowired
-        private NoticeService noticeService;
+	@Autowired
+	private NoticeService noticeService;
 
-        @RequestMapping(value = "/notice", method=RequestMethod.GET)
-        public ResponseEntity<List<Notice>> getAllNotice(){
+    	@Autowired
+    	private DiscoveryClient discoveryClient;
 
-                final List<Notice> allMembers = noticeService.findAllNotice();
+	@RequestMapping(value = "/notice", method=RequestMethod.GET)
+	public ResponseEntity<List<Notice>> getAllNotice(){
+	
+		Optional<List<Notice>> maybeAllStory = Optional.ofNullable(noticeService.findAllNotice());
+		
+		return new ResponseEntity<List<Notice>>(maybeAllStory.get(), HttpStatus.OK);
+		
+	}	
 
-                if (allMembers.isEmpty()) {
-                        return new ResponseEntity<List<Notice>>(HttpStatus.NO_CONTENT);
-                }
+	@RequestMapping(value="/notice/{receiver_id}", method = RequestMethod.GET)
+	public ResponseEntity<List<Notice>> getAllNoticeByReceiverId(@PathVariable("receiver_id") final String receiver_id)
+	{
 
-                return new ResponseEntity<List<Notice>>(allMembers, HttpStatus.OK);
-        }
-
-        @RequestMapping(value="/notice/{receiver_id}", method = RequestMethod.GET)
-        public ResponseEntity<List<Notice>> getAllNoticeByReceiverId(@PathVariable("receiver_id") final String receiver_id)
-        {
-
-                final List<Notice> selectedNotice = noticeService.findAllNoticeByReceiverId(receiver_id);
-
-                if (selectedNotice.isEmpty())
-                {
-                        logger.info("404 Not Found"); ;
-                        return new ResponseEntity<List<Notice>>(HttpStatus.NOT_FOUND);
-                }
-
-                return new ResponseEntity<List<Notice>>(selectedNotice, HttpStatus.OK);
-
-        }
-        
-        @RequestMapping(value="/notice/latest/{receiver_id}",method = RequestMethod.GET)
-        public ResponseEntity<List<Notice>> getLastNoticeByReceiverId(@PathVariable("receiver_id") final String receiver_id)
-        {
-
-                final List<Notice> LastNotice = noticeService.findLatestNoticeByReceiverId(receiver_id);
-
-                if(LastNotice.isEmpty())
-                {
-                        logger.info("GetLastNoriceByReceiverId, 404 Not Found");
-                        return new ResponseEntity<List<Notice>>(HttpStatus.NOT_FOUND);
-
-                }
-
-                return new ResponseEntity<List<Notice>>(LastNotice , HttpStatus.OK);
-        }
-        
-        @RequestMapping(value="/notice/previous/{receiver_id}/{id}",method = RequestMethod.GET)
-        public ResponseEntity<List<Notice>> getPreviousNoticeByReceiverId(@PathVariable("receiver_id") final String receiver_id,   @PathVariable("id") final int id)
-        {
-
-                final List<Notice> PreviousNotice = noticeService.findPreviousNoticeByReceiverId(receiver_id,id);
-
-                if(PreviousNotice.isEmpty())
-                {
-                        logger.info("GetPreviousNoticeByReceiverId, 404 Not Found");
-                        return new ResponseEntity<List<Notice>>(HttpStatus.NOT_FOUND);
-
-                }
-
-                return new ResponseEntity<List<Notice>>(PreviousNotice , HttpStatus.OK);
-        }
+		try {
+			Optional<List<Notice>> maybeSelectedNotice =
+				Optional.of(noticeService.findAllNoticeByReceiverId(receiver_id));
+		
+			return new ResponseEntity<List<Notice>>(maybeSelectedNotice.get(), HttpStatus.OK);
+			
+		}catch(Exception e)
+		{
+			return new ResponseEntity<List<Notice>>(HttpStatus.NOT_FOUND);
+		}
+	}
 
 ```
 
@@ -581,4 +604,5 @@ public class NoticeController {
 
 ### 이상으로 Spring Cloud Netflix의 여러 instance를 이용해 MSA 구축에 필요한 Service를 API Server형태로 구현해 보았다. ###
 
-
+*추가로 HystrixMethod 또한 적용한다. Hystrix에 대한 이해가 필요하다면 다음을 참고하자.
+*Hystrix에 대한 이해  => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Eureka-Tutorial/*
