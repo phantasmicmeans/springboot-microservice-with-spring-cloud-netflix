@@ -197,7 +197,7 @@ bootstrap.yml file은 Spring cloud application에서 apllication.yml보다 먼�
 
 **1. bootstrap.yml**
 
-```xml
+```yml
 spring:
     application:
         name: notice-service
@@ -223,8 +223,7 @@ spring:
 
 **2. application.yml**
 
-```xml
-
+```yml
 server:
     port: 8763
 
@@ -530,7 +529,7 @@ public class NoticeServiceImpl implements NoticeService{
 
 &nbsp;
 
-## 6. Rest Controller ## 
+## 6. Rest Controller
 
 이제 controller를 만들어 보자. rest package를 따로 만들고 그곳에 RestController들을 정의한다. 
 
@@ -590,7 +589,7 @@ public class NoticeController {
 ```
 &nbsp;
 
-## 7. Maven Packaging ## 
+## 7. Maven Packaging 
 
 Host OS에 설치된 maven을 이용해도 되고, spring boot application의 maven wrapper를 사용해도 된다
 (maven wrapper는 Linux, OSX, Windows, Solaris 등 서로 다른 OS에서도 동작한다. 따라서 추후에 여러 서비스들을 Jenkins에서 build 할 때 각 서비스들의 Maven version을 맞출 필요가 없다.)
@@ -611,7 +610,7 @@ Host OS에 설치된 maven을 이용해도 되고, spring boot application의 ma
 ```
 &nbsp;
 
-## 8. Execute Spring Boot Application ##
+## 8. Execute Spring Boot Application 
 
 REST API Server가 제대로 구축 되어졌는지 확인해보자.
 
@@ -629,7 +628,7 @@ Client가 Eureka Server에 등록 될 때 약간의 시간이 소요될 수 있�
 
 &nbsp;
 
-## 9. Dockerizing ## 
+## 9. Dockerizing 
 
 구축한 Eureka Client를 docker image를 만들어 볼 차례이다. 먼저 Dockerfile을 작성한다. 
 
@@ -673,7 +672,7 @@ openjdk                         8-jdk-alpine        224765a6bdbe        5 months
 ```
 &nbsp;
 
-## 10.  Run Docker Container ##
+## 10.  Run Docker Container 
 
 Docker image를 생성하였으므로 이미지를 실행 시켜보자.
 
@@ -685,8 +684,7 @@ Docker image를 생성하였으므로 이미지를 실행 시켜보자.
 
 &nbsp;
 
-
-## Conclusion ## 
+## Conclusion 
 
 이상으로 간단한 REST API Server로 구축된 Microservice를 Eureka Client로 구성해 보았다. 다음 장에서는 Eureka Client로 구성된 Microservice에 Hystrix를 적용해 볼 것이다.
 
