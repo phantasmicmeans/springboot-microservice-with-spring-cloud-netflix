@@ -16,7 +16,6 @@ by S.M.Lee
 웹 어플리케이션을 구동하였으나, Spring boot는 JAR파일에 내장 tomcat이 존재하여, 단순히 JAR파일을 빌드하고 실행하는 것 만으로 웹 어플리케이션 구동이 가능하다.
 > - JPA repository로 DB(MySQL 5.6)에 접근한다.
 
-  
 &nbsp;
 &nbsp;
 
@@ -56,10 +55,12 @@ by S.M.Lee
 
 **Service는 "Service Register & Discovery" Server인 Eureka Server의 Client이다.**
 
-진행하기에 앞서 Eureka와 Hystrix에 대한 이해는 필수적이다. 하지만 단순히 REST API Server 구축이 목표라면 스킵하고 진행해도 된다.
+
+진행하기에 앞서 Eureka에 대한 이해가 필요하다. Hystrix는 다음 장에서 다룰 예정이지만, Eureka에 대한 이해는 필수적이다.
+하지만 단순히 REST API Server 구축이 목표라면 스킵하고 진행해도 된다.
 
 > - *Netflix의 Eureka에 대한 이해 => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Eureka-Tutorial/*
-> - *Hystrix에 대한 이해  => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Eureka-Tutorial/*
+> - *Hystrix에 대한 이해  => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Hystrix/*
 > - *Service Registration and Discovery => https://spring.io/guides/gs/service-registration-and-discovery/*
 > - *Service Discovery: Eureka Clients =>https://cloud.spring.io/spring-cloud-netflix/multi/multi__service_discovery_eureka_clients.html*
 
@@ -80,7 +81,7 @@ Eureka Client는 Registry에 자신의 hostname을 등록하게 되는데 이는
     
 ## 1. Dependency ##
 
-Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka-client dependency를 추가한다. 그리고 hystrix 적용을 위해 hystrix dependency 또한 추가한다.
+Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka-client dependency를 추가한다. 그리고 hystrix 적용을 위해 hystrix dependency를 추가한다. 그리고 dockerfile-maven-plugin 또한 추가한다. 
 
 
 **pom.xml**
@@ -290,6 +291,8 @@ dependency는 앞에서 설정 했으므로 main class에 @EnableEurekaClient an
 
 ## 4. REST API Server 구축 ##
 
+&nbsp;
+
 **REST API**
 
 METHOD | PATH | DESCRIPTION 
@@ -316,6 +319,8 @@ POST | /notice/ | 알림 정보 입력
 
 우리는 JPA를 이용해 DB에 접근할 것이다. 따라서 JPA란 무엇인지에 대해 간단하게 알아보고 넘어가자.
 (DB setting은 개인적으로 하자..)
+
+&nbsp;
 
 **JPA란?**
 
@@ -345,6 +350,7 @@ Annotaion | DESCRIPTION
 
 @Table annotaion또한 기본적으로 @Entity로 선언된 class의 이름과 실제 DB의 Table 명이 일치하는 것을 mapping한다.
 
+&nbsp;
 
 ## 4.1 JPA Entity ##
 
@@ -526,7 +532,6 @@ public class NoticeServiceImpl implements NoticeService{
 이제 controller를 만들어 보자. rest package를 따로 만들고 그곳에 RestController들을 정의한다. 
 
 
-
     ├── rest   
     │   ├── NoticeController.java 
     
@@ -578,31 +583,105 @@ public class NoticeController {
 
 ```
 
-## 7. docker build ## 
+## 7. Maven Packaging ## 
 
-이제 docker image를 만들어 볼 차례이다. 먼저 jar파일을 생성하고 Dockerfile을 추가한다.
+Host OS에 설치된 maven을 이용해도 되고, spring boot application의 maven wrapper를 사용해도 된다
+(maven wrapper는 Linux, OSX, Windows, Solaris 등 서로 다른 OS에서도 동작한다. 따라서 추후에 여러 서비스들을 Jenkins에서 build 할 때 각 서비스들의 Maven version을 맞출 필요가 없다.)
+
+*A Quick Guide to Maven Wrapper => http://www.baeldung.com/maven-wrapper)*
+
+**a. Host OS의 maven 이용**
+
+```bash
+[sangmin@Mint-SM] ~/springcloud-service $ mvn package 
+```
+&nbsp;
+
+**b. maven wrapper 이용**
+
+```bash
+[sangmin@Mint-SM] ~/springcloud-service $ ./mvnw package 
+```
+
+## 8. Execute Spring Boot Application ##
+
+REST API Server가 제대로 구축 되어졌는지 확인해보자.
+
+```bash
+[sangmin@Mint-SM] ~/springcloud-service $java -jar target/{your_application_name}.jar
+```
+
+Eureka Dashboard를 통해 Client가 제대로 등록 되어졌는지 확인해보자
+
+Check Your Eureka Dashboard 
+ * http://{Your-Eureka-Server-Address}:8761 
+ * http://{Your-Eureka-Server-Address}:8761/eureka/apps
+
+Client가 Eureka Server에 등록 될 때 약간의 시간이 소요될 수 있다.
+
+## 8. Dockerizing ## 
+
+구축한 Eureka Client를 docker image를 만들어 볼 차례이다. 먼저 Dockerfile을 작성한다. 
 
 > -       $mvn package 
 
 
 **Dockerfile**
 ```
-     FROM openjdk:8-jdk-alpine
-     VOLUME /tmp
-     ARG JAR_FILE
-     ADD ${JAR_FILE} app.jar
-     ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+	FROM openjdk:8-jdk-alpine
+	VOLUME /tmp
+	#ARG JAR_FILE
+	#ADD ${JAR_FILE} app.jar
+	#dockerfile-maven-plugin으로 docker image를 생성하려면 아래 ADD ~를 주석처리하고, 위 2줄의 주석을 지우면 된다.
+	ADD ./target/notice-service-0.0.1.jar app.jar
+	ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 ```
 
+Dockerfile 작성이 끝났다면 image를 build 하자
 
-이제 docker image를 빌드한다. 
+**a. dockerfile-maven-plugin 사용시**
 
-> -       $mvn dockerfile:build
+```bash
+[sangmin@Mint-SM] ~/springcloud-service $ ./mvnw dockerfile:build
+```
+&nbsp;
 
-빌드가 완료 되었다면 $docker images 명령어를 통해 docker image를 확인할 수 있다. 
+**b. docker CLI 사용시**
+
+```bash
+[sangmin@Mint-SM] ~/springcloud-service $ docker build -t {your_docker_id}/notice-service:latest
+```
+
+이후 docker image가 잘 생성 되었음을 확인하자.
+
+```bash
+[sangmin@Mint-SM] ~/springcloud-service $ docker images
+REPOSITORY                      TAG                 IMAGE ID            CREATED             SIZE
+phantasmicmeans/notice-service  latest              4b79d6a1ed24        2 weeks ago         146MB
+openjdk                         8-jdk-alpine        224765a6bdbe        5 months ago        102MB
+
+```
+
+## 9.  Run Docker Container ##
+
+Docker image를 생성하였으므로 이미지를 실행 시켜보자.
+
+```bash
+[sangmin@Mint-SM] ~ $ docker run -it -p 8763:8763 phantasmicmeans/notice-service:latest 
+```
+
+이제 Eureka Dashboard를 통해 Client가 제대로 실행 되었는지 확인하면 된다.
+
+&nbsp;
 
 
-### 이상으로 Spring Cloud Netflix의 여러 instance를 이용해 MSA 구축에 필요한 Service를 API Server형태로 구현해 보았다. ###
+## Conclusion ## 
 
-*추가로 HystrixMethod 또한 적용한다. Hystrix에 대한 이해가 필요하다면 다음을 참고하자.
-*Hystrix에 대한 이해  => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Eureka-Tutorial/*
+이상으로 간단한 REST API Server로 구축된 Microservice를 Eureka Client로 구성해 보았다. 다음 장에서는 Eureka Client로 구성된 Microservice에 Hystrix를 적용해 볼 것이다.
+
+*다음 글*
+*Hystrix에 대한 이해 & => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Hystrix*
+*Spring boot Microservice에 Hystrix적용하기* => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Hystrix-Tutorial
+
+
+
