@@ -691,7 +691,7 @@ Docker image를 생성하였으므로 이미지를 실행 시켜보자.
 이상으로 간단한 REST API Server로 구축된 Microservice를 Eureka Client로 구성해 보았다. 다음 장에서는 Eureka Client로 구성된 Microservice에 Hystrix를 적용해 볼 것이다.
 
 **다음 글**
-* Hystrix에 대한 이해 & => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Hystrix*
+* Hystrix에 대한 이해 & => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Hystrix
 * Spring boot Microservice에 Hystrix적용하기* => https://github.com/phantasmicmeans/Spring-Cloud-Netflix-Hystrix-Tutorial
 
 
