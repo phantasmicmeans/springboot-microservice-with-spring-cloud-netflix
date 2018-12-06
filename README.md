@@ -1,3 +1,5 @@
+[![HitCount](http://hits.dwyl.io/phantasmicmeans/springboot-microservice-with-spring-cloud-netflix.svg)](http://hits.dwyl.io/phantasmicmeans/springboot-microservice-with-spring-cloud-netflix)
+
 Spring Boot Microservice with Spring Cloud Netflix
 ==============
 
