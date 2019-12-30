@@ -116,7 +116,6 @@ Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka
         	<dependency>
         		<groupId>org.springframework.cloud</groupId>
             		<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-           		<!--           <version>1.4.4.RELEASE</version> -->
         	</dependency>
         	<dependency>
             		<groupId>org.springframework.boot</groupId>
@@ -125,12 +124,10 @@ Eureka Client로 service를 만들기 위해 spring-cloud-starter-netflix-eureka
 		<dependency>
     			<groupId>org.springframework.boot</groupId>
             		<artifactId>spring-boot-starter-web</artifactId>
-            		<!--    <version>1.4.0.RELEASE</version> -->
         	</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>2.0.1.RELEASE</version>
 		</dependency>		
         	<dependency>
       			<groupId>mysql</groupId>
